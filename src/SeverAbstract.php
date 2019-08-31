@@ -17,7 +17,7 @@ use function sprintf;
  *
  * @package Jeekens\Server
  */
-abstract class Sever implements ServerInterface
+abstract class SeverAbstract implements ServerInterface
 {
 
     /**
