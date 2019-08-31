@@ -3,8 +3,12 @@
 
 namespace Jeekens\Server;
 
-
- final class SwooleEvents
+/**
+ * Class SWEvents
+ *
+ * @package Jeekens\Server
+ */
+ final class SWEvents
 {
 
     const ON_START = 'start';
