@@ -4,7 +4,7 @@
 namespace Jeekens\Server\Server;
 
 
-use Jeekens\Server\Sever;
+use Jeekens\Server\SeverAbstract;
 use Swoole\Server;
 use const SWOOLE_PROCESS;
 use const SWOOLE_SOCK_UDP;
@@ -14,7 +14,7 @@ use const SWOOLE_SOCK_UDP;
  *
  * @package Jeekens\Server\Server
  */
-class Udp extends Sever
+class Udp extends SeverAbstract
 {
 
     protected $host = '0.0.0.0';

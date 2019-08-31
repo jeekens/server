@@ -4,6 +4,7 @@
 namespace Jeekens\Server\Server;
 
 
+use Jeekens\Server\SeverAbstract;
 use Swoole\Server;
 use const SWOOLE_PROCESS;
 use const SWOOLE_SOCK_TCP;
@@ -13,7 +14,7 @@ use const SWOOLE_SOCK_TCP;
  *
  * @package Jeekens\Server\Server
  */
-class Tcp
+class Tcp extends SeverAbstract
 {
 
     protected $host = '0.0.0.0';

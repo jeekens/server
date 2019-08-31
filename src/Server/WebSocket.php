@@ -4,7 +4,7 @@
 namespace Jeekens\Server\Server;
 
 
-use Jeekens\Server\Sever;
+use Jeekens\Server\SeverAbstract;
 use Swoole\WebSocket\Server;
 use const SWOOLE_PROCESS;
 use const SWOOLE_SOCK_TCP;
@@ -14,7 +14,7 @@ use const SWOOLE_SOCK_TCP;
  *
  * @package Jeekens\Server\Server
  */
-class WebSocket extends Sever
+class WebSocket extends SeverAbstract
 {
     protected $host = '0.0.0.0';
 

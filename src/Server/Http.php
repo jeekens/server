@@ -4,7 +4,7 @@
 namespace Jeekens\Server\Server;
 
 
-use Jeekens\Server\Sever;
+use Jeekens\Server\SeverAbstract;
 use Swoole\Http\Server;
 use const SWOOLE_PROCESS;
 
@@ -13,7 +13,7 @@ use const SWOOLE_PROCESS;
  *
  * @package Jeekens\Server\Server
  */
-class Http extends Sever
+class Http extends SeverAbstract
 {
 
     protected $host = '0.0.0.0';
