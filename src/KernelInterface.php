@@ -7,6 +7,6 @@ namespace Jeekens\Server;
 interface KernelInterface
 {
 
-    public function getEventHandlerIterator(): ?EventHandlerIteratorInterface;
+    public function getEventHandlerIterator(): EventHandlerIteratorInterface;
 
 }
