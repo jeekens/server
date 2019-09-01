@@ -4,7 +4,7 @@
 namespace Jeekens\Server\Process;
 
 
-use  Swoole\Coroutine;
+use Swoole\Coroutine;
 use Swoole\Process as SWProcess;
 use function defined;
 use function sleep;
