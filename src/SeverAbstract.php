@@ -5,15 +5,12 @@ namespace Jeekens\Server;
 
 
 use RuntimeException;
-use Swoole\Http\Request;
-use Swoole\Http\Response;
 use Swoole\Server;
 use Throwable;
 use function array_map;
 use function array_merge;
 use function object_init;
 use function sprintf;
-use function var_dump;
 
 /**
  * Class Sever
