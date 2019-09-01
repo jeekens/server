@@ -30,7 +30,7 @@ use const SWOOLE_SOCK_UNIX_STREAM;
  *
  * @package Jeekens\Server
  */
-final class ServerStrategy
+final class ServerStrategy implements ServerStrategyInterface
 {
 
     const TYPE_WEBSOCKET = 'websocket';
@@ -94,6 +94,9 @@ final class ServerStrategy
         ],
     ];
 
+    /**
+     * @var array
+     */
     protected $customServerClass = [];
 
     /**
@@ -133,68 +136,12 @@ final class ServerStrategy
      */
     public function getServer(array $configure, string $pidFile, string $logFile, bool $daemon = false): ServerInterface
     {
-        /**
-         * @var $server ServerInterface
-         */
+
         if (count($configure) === 1) {
             $configure = $configure[0];
-            /**
-             * @var $type string
-             * @var $kernelClass string
-             * @var $daemon bool
-             */
-            $type = Arr::pull($configure, 'type');
-            $kernelClass = Arr::pull($configure, 'kernel');
-
-            if (($severClass = $this->getServerClassName($type) ?? null) && empty($severClass)) {
-                throw new InvalidArgumentException(sprintf('Unsupported server type: %s.', $type));
-            }
-
-            $server = new $severClass(
-                array_merge($this->getDefaultConf($type), $configure)
-            );
-
+            $server = $this->createSingleServer($configure, $kernelClass);
         } else {
-
-            $types = array_column($configure, 'type');
-            $wsIndex = array_search(self::TYPE_WEBSOCKET, $types, true);
-            $httpIndex = array_search(self::TYPE_HTTP, $types, true);
-            $master = null;
-
-            if ($wsIndex !== false) {
-                $serverConfig = Arr::pull($configure, $wsIndex);
-                $master = self::TYPE_WEBSOCKET;
-                $kernelClass = $serverConfig['kernel'] ?? '';
-                $serverClass = $this->getServerClassName($master);
-                $server = new $serverClass(
-                    array_merge($this->getDefaultConf($master), $serverConfig)
-                );
-            } elseif ($httpIndex !== false) {
-                $serverConfig = Arr::pull($configure, $httpIndex);
-                $master = self::TYPE_HTTP;
-                $kernelClass = $serverConfig['kernel'] ?? '';
-                $serverClass = $this->getServerClassName($master);
-                $server = new $serverClass(
-                    array_merge($this->getDefaultConf($master), $serverConfig)
-                );
-            } else {
-                $serverConfig = Arr::pull($configure, 0);
-                $master = $serverConfig['type'];
-                $kernelClass = $serverConfig['kernel'] ?? '';
-                $serverClass = $this->getServerClassName($master);
-                $server = new $serverClass(
-                    array_merge($this->getDefaultConf($master), $serverConfig)
-                );
-            }
-
-            foreach ($configure as $conf) {
-                $server->addListen(
-                    array_merge($this->getDefaultConf($conf['type']), $conf),
-                    $this->getKernel($conf['kernel']),
-                    $conf['setting'] ?? null
-                );
-            }
-
+            $server = $this->createMultipleMixServer($configure,$kernelClass);
         }
 
         $server->daemon($daemon);
@@ -208,7 +155,11 @@ final class ServerStrategy
         return $server;
     }
 
-
+    /**
+     * @param string $type
+     *
+     * @return string|null
+     */
     public function getServerClassName(string $type): ?string
     {
         if (isset($this->customServerClass[$type])) {
@@ -253,13 +204,93 @@ final class ServerStrategy
      *
      * @return array
      */
-    protected function getDefaultConf(?string $type = null): array
+    public function getDefaultConf(?string $type = null): array
     {
         if (empty($type)) {
             return $this->serverDefault;
         }
 
         return $this->serverDefault[$type] ?? [];
+    }
+
+
+    public function registerDefaultConf(string $type, array $conf)
+    {
+        $this->serverDefault[$type] = $conf;
+
+        return $this;
+    }
+
+    /**
+     * 根据配置创建服务器
+     *
+     * @param array $configure
+     * @param string $kernelClass
+     *
+     * @return ServerInterface
+     */
+    protected function createServer(array $configure)
+    {
+        /**
+         * @var $type string
+         */
+        $type = Arr::pull($configure, 'type');
+
+        if (($severClass = $this->getServerClassName($type) ?? null) && empty($severClass)) {
+            throw new InvalidArgumentException(sprintf('Unsupported server type: %s.', $type));
+        }
+
+        return new $severClass(
+            array_merge($this->getDefaultConf($type), $configure)
+        );
+    }
+
+    /**
+     * 创建单一服务
+     *
+     * @param array $configure
+     * @param $kernelClass
+     *
+     * @return ServerInterface
+     */
+    protected function createSingleServer(array $configure, string &$kernelClass)
+    {
+        /**
+         * @var $kernelClass string
+         */
+        $kernelClass = Arr::pull($configure, 'kernel');
+
+        return $this->createServer($configure);
+    }
+
+    /**
+     * 创建混合型服务
+     *
+     * @param array $configure
+     * @param string|null $kernelClass
+     *
+     * @return ServerInterface
+     */
+    protected function createMultipleMixServer(array $configure, string &$kernelClass = null)
+    {
+        $types = array_column($configure, 'type');
+        $index = array_search(self::TYPE_WEBSOCKET, $types, true);
+        $index = $index === false ? array_search(self::TYPE_HTTP, $types, true) : $index;
+        $index = $index === false ? 0 : $index;
+
+        $serverConfig = Arr::pull($configure, $index);
+        $kernelClass = $serverConfig['kernel'] ?? '';
+        $server = $this->createServer($serverConfig);
+
+        foreach ($configure as $conf) {
+            $server->addListen(
+                array_merge($this->getDefaultConf($conf['type']), $conf),
+                $this->getKernel($conf['kernel']),
+                $conf['setting'] ?? null
+            );
+        }
+
+        return $server;
     }
 
 }
