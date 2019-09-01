@@ -4,13 +4,8 @@
 namespace Jeekens\Server;
 
 
-use Jeekens\Std\Str;
-use ReflectionClass;
-use function array_keys;
-use function array_map;
 use function method_exists;
-use function strtolower;
-use function strtoupper;
+use function var_dump;
 
 /**
  * Class KernelAbstract
@@ -20,24 +15,43 @@ use function strtoupper;
 abstract class KernelAbstract implements KernelInterface
 {
 
+    protected $allEvent = [
+        SWEvents::ON_BUFFER_EMPTY,
+        SWEvents::ON_BUFFER_FULL,
+        SWEvents::ON_CLOSE,
+        SWEvents::ON_CONNECT,
+        SWEvents::ON_FINISH,
+        SWEvents::ON_HAND_SHAKE,
+        SWEvents::ON_MANAGER_START,
+        SWEvents::ON_MANAGER_STOP,
+        SWEvents::ON_MESSAGE,
+        SWEvents::ON_OPEN,
+        SWEvents::ON_PACKET,
+        SWEvents::ON_WORKER_STOP,
+        SWEvents::ON_WORKER_START,
+        SWEvents::ON_WORKER_EXIT,
+        SWEvents::ON_WORKER_ERROR,
+        SWEvents::ON_TIMER,
+        SWEvents::ON_TASK,
+        SWEvents::ON_START,
+        SWEvents::ON_SHUTDOWN,
+        SWEvents::ON_REQUEST,
+        SWEvents::ON_RECEIVE,
+        SWEvents::ON_PIPE_MESSAGE,
+    ];
+
+
     /**
      * @return EventHandlerIteratorInterface
-     *
-     * @throws \ReflectionException
      */
     public function getEventHandlerIterator(): EventHandlerIteratorInterface
     {
-        $ref = new ReflectionClass(SWEvents::class);
-
-        $allEvents = array_map(function ($const) {
-            return Str::camel(strtolower($const));
-        }, array_keys($ref->getConstants()));
-
         $eventHandlers = [];
 
-        foreach ($allEvents as $event) {
-            if (method_exists($this, $event)) {
-                $eventHandlers[$ref->getconstant(strtoupper(Str::snake($event)))] = [$this, $event];
+        foreach ($this->allEvent as $event) {
+            $method = 'on'.$event;
+            if (method_exists($this, $method)) {
+                $eventHandlers[$event] = [$this, $method];
             }
         }
 

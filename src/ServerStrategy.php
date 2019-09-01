@@ -253,7 +253,7 @@ final class ServerStrategy implements ServerStrategyInterface
      *
      * @return ServerInterface
      */
-    protected function createSingleServer(array $configure, string &$kernelClass)
+    protected function createSingleServer(array $configure, ?string &$kernelClass = null)
     {
         /**
          * @var $kernelClass string
@@ -271,7 +271,7 @@ final class ServerStrategy implements ServerStrategyInterface
      *
      * @return ServerInterface
      */
-    protected function createMultipleMixServer(array $configure, string &$kernelClass = null)
+    protected function createMultipleMixServer(array $configure, ?string &$kernelClass = null)
     {
         $types = array_column($configure, 'type');
         $index = array_search(self::TYPE_WEBSOCKET, $types, true);
