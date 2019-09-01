@@ -150,7 +150,7 @@ class Process
     }
 
     /**
-     * 安全关闭swoole进程，并且输出关闭过程
+     * 安全关闭swoole进程，并且输出关闭过程，进程阻塞模式
      *
      * @param int $pid
      * @param string $name
