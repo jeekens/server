@@ -146,7 +146,7 @@ final class ServerStrategy
             $type = Arr::pull($configure, 'type');
             $kernelClass = Arr::pull($configure, 'kernel');
 
-            if (($severClass = $this->getServerClassName($type) ?? null)) {
+            if (($severClass = $this->getServerClassName($type) ?? null) && empty($severClass)) {
                 throw new InvalidArgumentException(sprintf('Unsupported server type: %s.', $type));
             }
 
@@ -161,25 +161,28 @@ final class ServerStrategy
             $httpIndex = array_search(self::TYPE_HTTP, $types, true);
             $master = null;
 
-            if ($wsIndex !== null) {
+            if ($wsIndex !== false) {
                 $serverConfig = Arr::pull($configure, $wsIndex);
                 $master = self::TYPE_WEBSOCKET;
                 $kernelClass = $serverConfig['kernel'] ?? '';
-                $server = new ($this->getServerClassName($master))(
+                $serverClass = $this->getServerClassName($master);
+                $server = new $serverClass(
                     array_merge($this->getDefaultConf($master), $serverConfig)
                 );
-            } elseif ($httpIndex !== null) {
+            } elseif ($httpIndex !== false) {
                 $serverConfig = Arr::pull($configure, $httpIndex);
                 $master = self::TYPE_HTTP;
                 $kernelClass = $serverConfig['kernel'] ?? '';
-                $server = new ($this->getServerClassName($master))(
+                $serverClass = $this->getServerClassName($master);
+                $server = new $serverClass(
                     array_merge($this->getDefaultConf($master), $serverConfig)
                 );
             } else {
                 $serverConfig = Arr::pull($configure, 0);
                 $master = $serverConfig['type'];
                 $kernelClass = $serverConfig['kernel'] ?? '';
-                $server = new ($this->getServerClassName($master))(
+                $serverClass = $this->getServerClassName($master);
+                $server = new $serverClass(
                     array_merge($this->getDefaultConf($master), $serverConfig)
                 );
             }

@@ -8,7 +8,7 @@ use Jeekens\Std\Str;
 use ReflectionClass;
 use function array_keys;
 use function array_map;
-use function in_array;
+use function method_exists;
 use function strtolower;
 use function strtoupper;
 
@@ -27,8 +27,6 @@ abstract class KernelAbstract implements KernelInterface
      */
     public function getEventHandlerIterator(): EventHandlerIteratorInterface
     {
-        $methods = get_class_methods($this);
-
         $ref = new ReflectionClass(SWEvents::class);
 
         $allEvents = array_map(function ($const) {
@@ -37,9 +35,9 @@ abstract class KernelAbstract implements KernelInterface
 
         $eventHandlers = [];
 
-        foreach ($methods as $method) {
-            if (in_array($method, $allEvents)) {
-                $eventHandlers[$ref->getconstant(strtoupper($method))] = [$this, $method];
+        foreach ($allEvents as $event) {
+            if (method_exists($this, $event)) {
+                $eventHandlers[$ref->getconstant(strtoupper(Str::snake($event)))] = [$this, $event];
             }
         }
 

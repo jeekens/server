@@ -17,10 +17,7 @@
   "autoload": {
     "psr-4": {
       "Jeekens\\Server\\": "src/"
-    },
-    "files": [
-      "src/Helper.php"
-    ]
+    }
   },
   "minimum-stability": "dev",
   "require-dev": {

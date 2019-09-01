@@ -144,11 +144,11 @@ abstract class SeverAbstract implements ServerInterface
                     'log_file' => $this->getLogFile(),
                     'pid_file' => $this->getPidFile(),
                     'daemonize' => (int)$this->isDaemon(),
-                ], $this->getSetting() ?? null));
+                ], $this->getSetting() ?? []));
 
-                $this->registerEventHandle($this->server, $this->kernel);
+                $this->registerEventHandle($server, $this->kernel);
 
-                if (!empty($this->portListeners)) {
+                if (!empty($this->listen)) {
                     array_map(function ($portListener) use ($server) {
                         /**
                          * @var $port Server\Port
@@ -165,7 +165,7 @@ abstract class SeverAbstract implements ServerInterface
 
                         $this->registerEventHandle($port, $portListener['kernel']);
                         $this->listeners[] = $port;
-                    }, $this->portListeners);
+                    }, $this->listen);
                 }
 
                 $server->start();
@@ -269,21 +269,11 @@ abstract class SeverAbstract implements ServerInterface
      */
     protected function portArgsFormat(array $config)
     {
-        $args = [];
-
-        if (! isset($config['host'])) {
-            $args['host'] = $this->host;
-        }
-
-        if (! isset($config['port']) || $config['port'] === $this->port) {
-            $args['port'] = 0;
-        }
-
-        if (! isset($config['sock_type'])) {
-            $args['sock_type'] = $this->sockType;
-        }
-
-        return $args;
+        return [
+            'host' => $config['host'] ?? $this->host,
+            'port' => $config['port'] ?? $this->port,
+            'sock_type' => $config['sock_type'] ?? $this->sockType,
+        ];
     }
 
     /**
@@ -293,25 +283,12 @@ abstract class SeverAbstract implements ServerInterface
      */
     protected function serverArgsFormat(array $config)
     {
-        $args = [];
-
-        if (! isset($config['host'])) {
-            $args['host'] = $this->host;
-        }
-
-        if (! isset($config['port']) || $config['port'] === $this->port) {
-            $args['port'] = 0;
-        }
-
-        if (! isset($config['mode'])) {
-            $args['mode'] = $this->mode;
-        }
-
-        if (! isset($config['sock_type'])) {
-            $args['sock_type'] = $this->sockType;
-        }
-
-        return $args;
+        return [
+            'host' => $config['host'] ?? $this->host,
+            'port' => $config['port'] ?? $this->port,
+            'mode' => $config['mode'] ?? $this->mode,
+            'sock_type' => $config['sock_type'] ?? $this->sockType,
+        ];
     }
 
     /**
