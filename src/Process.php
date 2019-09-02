@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace Jeekens\Server\Process;
+namespace Jeekens\Process;
 
 
 use Swoole\Coroutine;
