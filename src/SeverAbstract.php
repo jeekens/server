@@ -570,7 +570,7 @@ abstract class SeverAbstract implements ServerInterface
     /**
      * @return mixed|null
      */
-    public function connections()
+    public function getConnections()
     {
         if ($this->isBoot()) {
             return $this->getServer()->connections;

@@ -193,7 +193,7 @@ interface ServerInterface
      *
      * @return mixed
      */
-    public function connections();
+    public function getConnections();
 
     /**
      * 返回task id map
