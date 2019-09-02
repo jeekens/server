@@ -53,7 +53,6 @@ class Process
      * @param int $confirmSignal
      * @param bool $retry
      * @param int $waitTime
-     * @param bool $retryBool
      *
      * @return int
      */
