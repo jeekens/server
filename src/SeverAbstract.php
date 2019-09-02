@@ -82,11 +82,6 @@ abstract class SeverAbstract implements ServerInterface
     protected $listen;
 
     /**
-     * @var Server\Port[]
-     */
-    protected $listeners;
-
-    /**
      * @var int
      */
     protected $masterPid = 0;
@@ -185,7 +180,6 @@ abstract class SeverAbstract implements ServerInterface
                         }
 
                         $this->registerEventHandle($port, $portListener['kernel']);
-                        $this->listeners[] = $port;
                     }, $this->listen);
                 }
 
@@ -502,7 +496,10 @@ abstract class SeverAbstract implements ServerInterface
      */
     public function getWorkPid(): int
     {
-        return $this->getServer()->worker_pid;
+        if ($this->isBoot()) {
+            return $this->getServer()->worker_pid;
+        }
+        return 0;
     }
 
     /**
@@ -510,15 +507,32 @@ abstract class SeverAbstract implements ServerInterface
      */
     public function getWorkId(): int
     {
-        return $this->getServer()->worker_id;
+        if ($this->isBoot()) {
+            return $this->getServer()->worker_id;
+        }
+        return 0;
     }
 
     /**
-     * @return bool
+     * @return Server\Port|null
      */
-    public function isTaskOrWork(): bool
+    public function getListeners()
     {
-        return $this->getServer()->taskworker;
+        if ($this->isBoot()) {
+            return $this->getServer()->ports;
+        }
+        return null;
+    }
+
+    /**
+     * @return int
+     */
+    public function isTaskOrWork(): int
+    {
+        if ($this->isBoot()) {
+            return $this->getServer()->taskworker ? 1 : -1;
+        }
+        return 0;
     }
 
     /**
@@ -551,6 +565,17 @@ abstract class SeverAbstract implements ServerInterface
     public function getTaskIdMap(): array
     {
         return $this->taskIdMap;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function connections()
+    {
+        if ($this->isBoot()) {
+            return $this->getServer()->connections;
+        }
+        return null;
     }
 
     /**

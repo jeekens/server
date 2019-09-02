@@ -30,6 +30,13 @@ interface ServerInterface
     public function getServer();
 
     /**
+     * 获取全部端口监听对象
+     *
+     * @return Server\Port|null
+     */
+    public function getListeners();
+
+    /**
      * 注册事件处理
      *
      * @param KernelInterface $kernel
@@ -182,6 +189,13 @@ interface ServerInterface
     public function getWorkId(): int;
 
     /**
+     * 获取服务中全部连接
+     *
+     * @return mixed
+     */
+    public function connections();
+
+    /**
      * 返回task id map
      *
      * @return array
@@ -189,10 +203,10 @@ interface ServerInterface
     public function getTaskIdMap(): array;
 
     /**
-     * 判断当前是task进程还是work进程
-     * @return bool
+     * 判断当前是task进程还是work进程，1表示task进程，-1表示work进程，0表示服务未启动
+     * @return int
      */
-    public function isTaskOrWork(): bool;
+    public function isTaskOrWork(): int;
 
     /**
      * 重启任务进程
