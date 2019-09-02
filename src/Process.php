@@ -255,4 +255,14 @@ class Process
         }
     }
 
+    /**
+     * 设置当前进程名称
+     *
+     * @param string $name
+     */
+    public static function setName(string $name)
+    {
+        swoole_set_process_name($name);
+    }
+
 }
