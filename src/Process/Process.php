@@ -28,7 +28,7 @@ class Process
 
     const SIGNAL_IS_RUN = 0; // 判断进程是否存在
     const SIGNAL_KILL = SIGKILL; // 强制杀掉进程
-    const SIGNAL_SW_STOP_WK = SIGTERM; // 主进程停止fork新进程，并杀掉所有正在运行的工作进程
+    const SIGNAL_SW_STOP_WK = SIGTERM; // 主进程停止fork新进程，并杀掉所有正在运行的工作进程(安全关闭)
     const SIGNAL_SW_RE_LOG = SIGRTMIN; // 日志重载
     const SIGNAL_SW_RESTART_WK = SIGUSR1; // 重启所有work进程
     const SIGNAL_SW_RESTART_TK = SIGUSR2; // 重启所有task_worker进程

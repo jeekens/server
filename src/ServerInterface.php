@@ -49,11 +49,6 @@ interface ServerInterface
     /**
      * @return mixed
      */
-    public function restart();
-
-    /**
-     * @return mixed
-     */
     public function start();
 
     /**
@@ -137,6 +132,72 @@ interface ServerInterface
      * @return bool
      */
     public function isDaemon(): bool;
+
+    /**
+     * @param int $workId
+     * @param bool $waitEvent
+     */
+    public function stopWork(int $workId = -1, bool $waitEvent = false);
+
+    /**
+     * 返回全部work进程id map
+     *
+     * @return int[]
+     */
+    public function getWorkPidMap(): array;
+
+    /**
+     * 返回master进程id
+     *
+     * @return int
+     */
+    public function getMasterPid(): int;
+
+    /**
+     * 返回manager进程id
+     *
+     * @return int
+     */
+    public function getManagerPid(): int;
+
+    /**
+     * 获取当前work进程pid
+     *
+     * @return int
+     */
+    public function getWorkPid(): int;
+
+    /**
+     * 获取work id map
+     *
+     * @return int[]
+     */
+    public function getWorkIdMap(): array;
+
+    /**
+     * 获取当前work id
+     *
+     * @return int
+     */
+    public function getWorkId(): int;
+
+    /**
+     * 返回task id map
+     *
+     * @return array
+     */
+    public function getTaskIdMap(): array;
+
+    /**
+     * 判断当前是task进程还是work进程
+     * @return bool
+     */
+    public function isTaskOrWork(): bool;
+
+    /**
+     * 重启任务进程
+     */
+    public function reloadTask();
 
     /**
      * @param bool $daemon

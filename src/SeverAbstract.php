@@ -9,6 +9,7 @@ use Swoole\Server;
 use Throwable;
 use function array_map;
 use function array_merge;
+use function array_values;
 use function object_init;
 use function sprintf;
 
@@ -84,6 +85,26 @@ abstract class SeverAbstract implements ServerInterface
      * @var Server\Port[]
      */
     protected $listeners;
+
+    /**
+     * @var int
+     */
+    protected $masterPid = 0;
+
+    /**
+     * @var int
+     */
+    protected $managerPid = 0;
+
+    /**
+     * @var int[]
+     */
+    protected $workIdMap = [];
+
+    /**
+     * @var array
+     */
+    protected $taskIdMap = [];
 
     /**
      * @return bool
@@ -169,6 +190,8 @@ abstract class SeverAbstract implements ServerInterface
                 }
 
                 $server->start();
+                $this->masterPid = $server->master_pid;
+                $this->managerPid = $server->manager_pid;
                 $this->server = $server;
 
             } catch (Throwable $e) {
@@ -423,19 +446,141 @@ abstract class SeverAbstract implements ServerInterface
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function reload()
     {
-        // TODO: Implement reload() method.
+        if ($this->isBoot()) {
+            $this->getServer()->reload();
+        }
     }
 
+    /**
+     * 安全的关闭服务
+     *
+     * @return mixed|void
+     */
     public function stop()
     {
-        // TODO: Implement stop() method.
+        if ($this->isBoot()) {
+            $this->getServer()->shutdown();
+        }
     }
 
-    public function restart()
+    /**
+     * 重启所有task进程
+     */
+    public function reloadTask()
     {
-        // TODO: Implement restart() method.
+        if ($this->isBoot()) {
+            $this->getServer()->reload(true);
+        }
+    }
+
+    /**
+     * @param int $workId
+     * @param bool $waitEvent
+     */
+    public function stopWork(int $workId = -1, bool $waitEvent = false)
+    {
+        if ($this->isBoot()) {
+            $this->getServer()->stop($workId, $waitEvent);
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getManagerPid(): int
+    {
+        return $this->managerPid;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWorkPid(): int
+    {
+        return $this->getServer()->worker_pid;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWorkId(): int
+    {
+        return $this->getServer()->worker_id;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTaskOrWork(): bool
+    {
+        return $this->getServer()->taskworker;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMasterPid(): int
+    {
+        return $this->masterPid;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getWorkIdMap(): array
+    {
+        return $this->workIdMap;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getWorkPidMap(): array
+    {
+        return array_values($this->workIdMap);
+    }
+
+    /**
+     * @return array
+     */
+    public function getTaskIdMap(): array
+    {
+        return $this->taskIdMap;
+    }
+
+    /**
+     * @param int $workerId
+     * @param int $taskId
+     */
+    public function addTaskMap(int $workerId, int $taskId)
+    {
+        $this->taskIdMap[$workerId][$taskId] = true;
+    }
+
+    /**
+     * @param int $workerId
+     * @param int $taskId
+     */
+    public function removeTaskMap(int $workerId, int $taskId)
+    {
+
+        if (isset($this->taskIdMap[$workerId][$taskId])) {
+            unset($this->taskIdMap[$workerId][$taskId]);
+        }
+    }
+
+    /**
+     * @param int|null $workerId
+     */
+    public function addWorkMap(?int $workerId = null)
+    {
+        $workerId = $workerId ?? $this->getWorkId();
+        $this->workIdMap[$workerId] = $this->getWorkPid();
     }
 
     /**
