@@ -7,6 +7,6 @@ namespace Jeekens\Server\Process;
 class Manager implements ManagerInterface
 {
 
-    
+
 
 }
