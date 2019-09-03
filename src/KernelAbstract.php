@@ -16,8 +16,8 @@ abstract class KernelAbstract implements KernelInterface
 {
 
     protected $allEvent = [
-        SWEvents::ON_BUFFER_EMPTY,
-        SWEvents::ON_BUFFER_FULL,
+//        SWEvents::ON_BUFFER_EMPTY,
+//        SWEvents::ON_BUFFER_FULL,
         SWEvents::ON_CLOSE,
         SWEvents::ON_CONNECT,
         SWEvents::ON_FINISH,
